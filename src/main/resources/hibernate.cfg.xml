@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- 数据库连接配置 -->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/ssh</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">123456</property>
+        <!-- dialect翻译为方言 Hibernate根据你选择的“方言”，针对每种数据库，作调整，如生成不同的SQL语句等 -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- 设置默认的数据库连接池 -->
+        <property name="connection.pool_size">5</property>
+
+        <!-- 显示SQL -->
+        <property name="show_sql">true</property>
+
+        <!-- 格式化SQL -->
+        <property name="format_sql">true</property>
+
+        <!-- 根据schema更新数据表的工具 -->
+        <property name="hbm2ddl.auto">update</property>
+
+        <!-- 数据表映射配置文件 -->
+        <mapping resource="mapper/SyOrgUser.hbm.xml"/>
+
+    </session-factory>
+</hibernate-configuration>

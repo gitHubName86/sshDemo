@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+    <!-- 配置数据库连接信息 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/ssh?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=GMT%2B8" />
+<!--        <property name="url" value="jdbc:mysql:///ssh?serverTimezone=UTC&amp;characterEncoding=utf-8" />-->
+        <property name="username" value="root" />
+        <property name="password" value="680991" />
+    </bean>
+
+    <!-- sessionFactory配置 -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" destroy-method="destroy">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mappingResources">
+            <list>
+                <value>mapper/SyOrgUser.hbm.xml</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="show_sql">true</prop>
+            </props>
+        </property>
+
+        <!-- 注入Hibernate 配置文件路径,前面要加上  classpath:-->
+
+
+<!--        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>-->
+
+
+        <!-- 配置hibernate的基本信息 -->
+<!--        <property name="hibernateProperties">-->
+<!--            <props>-->
+<!--                <prop key="hibernate.connection.url" >jdbc:mysql:///ssh</prop>-->
+<!--                <prop key="hibernate.connection.username" >root</prop>-->
+<!--                <prop key="hibernate.connection.password" >680991</prop>-->
+<!--                <prop key="hibernate.dialect" >org.hibernate.dialect.MySQL5Dialect</prop>-->
+
+<!--                &lt;!&ndash;  可选配置 &ndash;&gt;-->
+<!--                <prop key="hibernate.show_sql" >true</prop>-->
+<!--                <prop key="hibernate.format_sql" >true</prop>-->
+<!--                <prop key="hibernate.hbm2ddl.auto" >update</prop>-->
+<!--            </props>-->
+<!--        </property>-->
+<!--        &lt;!&ndash; 引入orm元数据，指定所在包路径，spring自动读取 &ndash;&gt;-->
+<!--        <property name="mappingDirectoryLocations" value="classpath:mapper"></property>-->
+    </bean>
+
+    <!-- 注入userDao -->
+    <bean id="userDao" class="com.fzp.dao.impl.SyOrgUserDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+
+    <!-- 注入userService -->
+    <bean id="userService" class="com.fzp.service.impl.SyOrgUserServiceImpl">
+        <property name="userDao" ref="userDao"></property>
+    </bean>
+
+    <bean id="indexAction" class="com.fzp.action.IndexAction">
+        <property name="userService" ref="userService"></property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+<!--    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">-->
+<!--        <property name="sessionFactory" ref="sessionFactory"></property>-->
+<!--    </bean>-->
+
+    <!-- 定义事务通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!-- 定义方法的过滤规则 -->
+        <tx:attributes>
+            <!-- 所有方法都使用事务 -->
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 定义AOP配置 -->
+    <aop:config>
+        <!-- 定义一个切入点 -->
+        <aop:pointcut id="services" expression="execution(* com.fzp.service.*.*(..))"/>
+        <!-- 对切入点和事务的通知 进行适配 -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="services"/>
+    </aop:config>
+
+</beans>

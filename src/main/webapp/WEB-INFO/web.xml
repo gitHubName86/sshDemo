@@ -16,4 +16,26 @@
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
+
+    <!-- spring监听 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring.xml</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>classpath:log4j2.xml</param-value>
+        <!-- <param-value>/WEB-INF/log4j.xml</param-value> -->
+    </context-param>
+
+    <jsp-config>
+        <taglib>
+            <taglib-uri>/struts-tags</taglib-uri>
+            <taglib-location>/WEB-INFO/lib/struts-tags.tld</taglib-location>
+        </taglib>
+    </jsp-config>
 </web-app>
