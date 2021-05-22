@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import java.math.BigInteger;
@@ -43,11 +44,15 @@ public class SyOrgUserDaoImpl extends HibernateDaoSupport implements SyOrgUserDa
     }
 
     public List<SyOrgUser> getUsersTwo(){
-        String sqlStr = "select uid, name, sex, telphone, mail from sy_org_user where uid=:uid";
-        Session session = sessionFactory.openSession();
-        Query query = session.createSQLQuery(sqlStr).addScalar("uid", StandardBasicTypes.INTEGER);
-        query.setParameter("uid", 1);
-        List<SyOrgUser> listUser = query.list();
+        HibernateTemplate hibernateTemplate = getHibernateTemplate();
+        SyOrgUser syOrgUser = new SyOrgUser();
+        syOrgUser.setSex("1");
+        List<SyOrgUser> listUser = hibernateTemplate.findByExample(syOrgUser, 0, 10);
+//        String sqlStr = "select uid, name, sex, telphone, mail from sy_org_user where uid=:uid";
+//        Session session = sessionFactory.openSession();
+//        Query query = session.createSQLQuery(sqlStr).addScalar("uid", StandardBasicTypes.INTEGER);
+//        query.setParameter("uid", 1);
+//        List<SyOrgUser> listUser = query.list();
         return listUser;
     }
 
